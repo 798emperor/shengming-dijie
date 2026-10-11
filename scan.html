@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="扫码打开「生命递接」。">
+<meta name="theme-color" content="#c8352c">
+<title>生命递接扫码卡</title>
+<style>
+  :root{
+    --ink:#2b1a1c;
+    --ink-soft:#4d3537;
+    --muted:#8d7072;
+    --paper:#fff4f2;
+    --card:#ffffff;
+    --line:#f2d8d4;
+    --coral:#c8352c;
+    --coral-deep:#9f2a22;
+    --shell-2:#ffffff;
+    --shell-3:#f0cfca;
+    --shell-glow:rgba(196,70,62,.16);
+    --shadow:rgba(120,40,34,.20);
+  }
+  :root[data-theme="dark"]{
+    --ink:#f3e9e7;
+    --ink-soft:#d3c2bf;
+    --muted:#a58c8c;
+    --paper:#201314;
+    --card:#2a1a1b;
+    --line:#3d2628;
+    --coral:#e4766c;
+    --coral-deep:#f0948b;
+    --shell-2:#241416;
+    --shell-3:#120b0c;
+    --shell-glow:rgba(228,118,108,.14);
+    --shadow:rgba(0,0,0,.5);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#f3e9e7;
+      --ink-soft:#d3c2bf;
+      --muted:#a58c8c;
+      --paper:#201314;
+      --card:#2a1a1b;
+      --line:#3d2628;
+      --coral:#e4766c;
+      --coral-deep:#f0948b;
+      --shell-2:#241416;
+      --shell-3:#120b0c;
+      --shell-glow:rgba(228,118,108,.14);
+      --shadow:rgba(0,0,0,.5);
+    }
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    padding:40px 18px 60px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:26px;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--shell-glow) 0%, transparent 62%),
+      linear-gradient(168deg, var(--shell-2) 0%, var(--paper) 48%, var(--shell-3) 100%);
+    background-color:var(--paper);
+    background-attachment:fixed;
+    font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Noto Sans CJK SC",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:"Songti SC","SimSun","Noto Serif CJK SC",serif}
+
+  /* ---------- poster ---------- */
+  .poster{
+    width:420px;max-width:100%;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:0 26px 60px -22px var(--shadow);
+    padding:38px 36px 30px;
+    display:flex;flex-direction:column;align-items:center;
+    position:relative;overflow:hidden;
+  }
+  .poster::before{
+    content:"";position:absolute;left:0;right:0;top:0;height:5px;
+    background:linear-gradient(90deg,var(--coral),var(--coral-deep));
+  }
+  .eyebrow{
+    font-size:10.5px;letter-spacing:.3em;color:var(--muted);margin:0 0 16px;
+  }
+  .mark{
+    width:56px;height:56px;border-radius:50%;border:1px solid var(--coral);
+    display:grid;place-items:center;margin-bottom:18px;
+  }
+  .mark svg{width:30px;height:30px;display:block}
+  .poster h1{
+    font-family:"Songti SC","SimSun","Noto Serif CJK SC",serif;
+    margin:0 0 10px;font-size:34px;letter-spacing:.2em;font-weight:600;
+    text-indent:.2em;
+  }
+  .poster .lede{
+    margin:0 0 28px;font-size:13px;line-height:1.9;color:var(--muted);
+    text-align:center;max-width:26em;
+  }
+
+  /* ---------- qr ---------- */
+  .qrbox{
+    position:relative;
+    padding:16px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+  }
+  .qrbox svg{display:block;width:232px;height:232px;shape-rendering:crispEdges}
+  .qrbadge{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:48px;height:48px;border-radius:12px;background:#fff;
+    border:2px solid var(--coral);display:grid;place-items:center;
+  }
+  .qrbadge svg{width:26px;height:26px;display:block}
+
+  .scanhint{
+    margin:20px 0 0;font-size:13px;letter-spacing:.1em;color:var(--ink-soft);
+    display:flex;align-items:center;gap:9px;
+  }
+  .scanhint svg{width:17px;height:17px;color:var(--coral);flex:0 0 auto}
+  .urlline{
+    margin:10px 0 0;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:10.5px;color:var(--muted);word-break:break-all;text-align:center;
+    max-width:30em;line-height:1.6;
+  }
+  .rule{width:100%;height:1px;background:var(--line);margin:26px 0 16px}
+  .footnote{
+    margin:0;font-size:10.5px;line-height:1.8;color:var(--muted);text-align:center;
+  }
+
+  /* ---------- status / notes ---------- */
+  .status{
+    width:420px;max-width:100%;
+    border:1px solid var(--line);border-left:2px solid var(--coral);
+    border-radius:0 10px 10px 0;
+    padding:14px 16px;font-size:11.5px;line-height:1.85;color:var(--muted);
+    background:var(--card);
+  }
+  .status b{color:var(--ink);font-weight:600;letter-spacing:.06em}
+  .status code{
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;
+    color:var(--coral);word-break:break-all;
+  }
+  .status ul{margin:8px 0 0;padding-left:1.1em}
+  .status li{margin-bottom:4px}
+
+  @media print{
+    body{background:#fff;padding:0;gap:0}
+    .status{display:none}
+    .poster{box-shadow:none;border:none;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<section class="poster">
+  <p class="eyebrow">遗体与器官捐献 · 界面演示</p>
+
+  <div class="mark" aria-hidden="true">
+    <svg viewBox="0 0 48 48" fill="none" stroke="var(--coral)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 40C24 40 8 30.5 8 19.5C8 13.7 12.5 9.5 17.6 9.5C20.6 9.5 23 11 24 12.8C25 11 27.4 9.5 30.4 9.5C35.5 9.5 40 13.7 40 19.5C40 24 37.3 28 34 31"/>
+      <path d="M20 24.5h4l2.2-4.5 2.6 9 2.4-4.5H40"/>
+    </svg>
+  </div>
+
+  <h1>生命递接</h1>
+  <p class="lede">扫码打开「人体地图」,点开身体上的任意一处,看看它做什么、有多少人把它留了下来,以及它后来的去处。</p>
+
+  <div class="qrbox">
+    <div id="qr" role="img" aria-label="扫码打开生命递接演示"></div>
+    <div class="qrbadge" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" stroke="var(--coral)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 40C24 40 8 30.5 8 19.5C8 13.7 12.5 9.5 17.6 9.5C20.6 9.5 23 11 24 12.8C25 11 27.4 9.5 30.4 9.5C35.5 9.5 40 13.7 40 19.5C40 24 37.3 28 34 31"/>
+      </svg>
+    </div>
+  </div>
+
+  <p class="scanhint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3M4 12h16"/></svg>
+    用手机相机或微信扫一扫
+  </p>
+  <p class="urlline" id="urlline"></p>
+
+  <div class="rule"></div>
+  <p class="footnote">页内统计与故事均为界面演示内容,不代表任何机构发布的真实数据。<br>正式登记请通过中国人体器官捐献管理中心或当地红十字会办理。</p>
+</section>
+
+<div class="status" id="status"></div>
+
+<script>
+/* ============================================================
+   极简 QR 编码器(字节模式,版本 1–10,支持 L/M/Q/H)
+   纯本地计算,不请求任何外部服务。
+   ============================================================ */
+(function(){
+  "use strict";
+
+  /* ---- GF(256) ---- */
+  var EXP=new Uint8Array(512), LOG=new Uint8Array(256);
+  (function(){
+    var x=1;
+    for(var i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x<<=1; if(x&0x100) x^=0x11D; }
+    for(var j=255;j<512;j++) EXP[j]=EXP[j-255];
+  })();
+  function gmul(a,b){ return (a===0||b===0)?0:EXP[LOG[a]+LOG[b]]; }
+
+  function rsGenerator(deg){
+    var poly=[1];
+    for(var i=0;i<deg;i++){
+      var next=new Array(poly.length+1).fill(0);
+      for(var j=0;j<poly.length;j++){
+        next[j]^=gmul(poly[j],1);
+        next[j+1]^=gmul(poly[j],EXP[i]);
+      }
+      poly=next;
+    }
+    return poly;
+  }
+  function rsEncode(data,ecLen){
+    var gen=rsGenerator(ecLen);
+    var res=new Array(ecLen).fill(0);
+    for(var i=0;i<data.length;i++){
+      var factor=data[i]^res[0];
+      res.shift(); res.push(0);
+      for(var j=0;j<ecLen;j++) res[j]^=gmul(gen[j+1],factor);
+    }
+    return res;
+  }
+
+  /* ---- 版本/纠错分块表(版本 1–10) ----
+     [每块纠错码字数, 组1块数, 组1每块数据码字, 组2块数, 组2每块数据码字] */
+  var BLOCKS={
+    L:[[7,1,19,0,0],[10,1,34,0,0],[15,1,55,0,0],[20,1,80,0,0],[26,1,108,0,0],
+       [18,2,68,0,0],[20,2,78,0,0],[24,2,97,0,0],[30,2,116,0,0],[18,2,68,2,69]],
+    M:[[10,1,16,0,0],[16,1,28,0,0],[26,1,44,0,0],[18,2,32,0,0],[24,2,43,0,0],
+       [16,4,27,0,0],[18,4,31,0,0],[22,2,38,2,39],[22,3,36,2,37],[26,4,43,1,44]],
+    Q:[[13,1,13,0,0],[22,1,22,0,0],[18,2,17,0,0],[26,2,24,0,0],[18,2,15,2,16],
+       [24,4,19,0,0],[18,2,14,4,15],[22,4,18,2,19],[20,4,16,4,17],[24,6,19,2,20]],
+    H:[[17,1,9,0,0],[28,1,16,0,0],[22,2,13,0,0],[16,4,9,0,0],[22,2,11,2,12],
+       [28,4,15,0,0],[26,4,13,1,14],[26,4,14,2,15],[24,4,12,4,13],[28,6,15,2,16]]
+  };
+  var ALIGN=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50]];
+  var REMAINDER=[0,7,7,7,7,7,0,0,0,0];
+  var ECBITS={L:1,M:0,Q:3,H:2};
+
+  function dataCodewords(ver,ec){
+    var b=BLOCKS[ec][ver-1];
+    return b[1]*b[2]+b[3]*b[4];
+  }
+
+  /* ---- 比特流 ---- */
+  function BitBuf(){ this.bits=[]; }
+  BitBuf.prototype.put=function(val,len){
+    for(var i=len-1;i>=0;i--) this.bits.push((val>>>i)&1);
+  };
+
+  function toUtf8(str){
+    var out=[],i,c;
+    for(i=0;i<str.length;i++){
+      c=str.charCodeAt(i);
+      if(c<0x80) out.push(c);
+      else if(c<0x800){ out.push(0xC0|(c>>6),0x80|(c&63)); }
+      else if(c<0xD800||c>=0xE000){ out.push(0xE0|(c>>12),0x80|((c>>6)&63),0x80|(c&63)); }
+      else {
+        i++;
+        var cp=0x10000+(((c&0x3FF)<<10)|(str.charCodeAt(i)&0x3FF));
+        out.push(0xF0|(cp>>18),0x80|((cp>>12)&63),0x80|((cp>>6)&63),0x80|(cp&63));
+      }
+    }
+    return out;
+  }
+
+  /* ---- 主编码 ---- */
+  function encode(text,ec){
+    var bytes=toUtf8(text), ver=0, i, j;
+    for(i=1;i<=10;i++){
+      var cci=(i<10)?8:16;
+      var need=Math.ceil((4+cci+8*bytes.length)/8);
+      if(need<=dataCodewords(i,ec)){ ver=i; break; }
+    }
+    if(!ver) throw new Error("内容过长,超出版本 10 容量");
+
+    var cciBits=(ver<10)?8:16;
+    var total=dataCodewords(ver,ec);
+    var bb=new BitBuf();
+    bb.put(4,4);
+    bb.put(bytes.length,cciBits);
+    for(i=0;i<bytes.length;i++) bb.put(bytes[i],8);
+    var term=Math.min(4,total*8-bb.bits.length);
+    bb.put(0,term);
+    while(bb.bits.length%8) bb.bits.push(0);
+
+    var cw=[];
+    for(i=0;i<bb.bits.length;i+=8){
+      var v=0; for(j=0;j<8;j++) v=(v<<1)|bb.bits[i+j];
+      cw.push(v);
+    }
+    var pad=[0xEC,0x11],k=0;
+    while(cw.length<total) cw.push(pad[k++%2]);
+
+    /* 分块 + RS */
+    var spec=BLOCKS[ec][ver-1], ecLen=spec[0];
+    var blocks=[],pos=0,n;
+    for(n=0;n<spec[1];n++){ blocks.push(cw.slice(pos,pos+spec[2])); pos+=spec[2]; }
+    for(n=0;n<spec[3];n++){ blocks.push(cw.slice(pos,pos+spec[4])); pos+=spec[4]; }
+    var eccs=blocks.map(function(b){ return rsEncode(b,ecLen); });
+
+    /* 交织 */
+    var out=[],maxLen=Math.max.apply(null,blocks.map(function(b){return b.length;}));
+    for(i=0;i<maxLen;i++) for(j=0;j<blocks.length;j++) if(i<blocks[j].length) out.push(blocks[j][i]);
+    for(i=0;i<ecLen;i++) for(j=0;j<eccs.length;j++) out.push(eccs[j][i]);
+
+    /* 位串 */
+    var bits=[];
+    for(i=0;i<out.length;i++) for(j=7;j>=0;j--) bits.push((out[i]>>j)&1);
+    for(i=0;i<REMAINDER[ver-1];i++) bits.push(0);
+
+    return buildMatrix(ver,ec,bits);
+  }
+
+  /* ---- 矩阵 ---- */
+  function buildMatrix(ver,ec,bits){
+    var size=ver*4+17, i, j, r, c;
+    var m=[],fn=[];
+    for(i=0;i<size;i++){ m.push(new Array(size).fill(0)); fn.push(new Array(size).fill(0)); }
+
+    function setFn(r,c,v){ if(r>=0&&r<size&&c>=0&&c<size){ m[r][c]=v; fn[r][c]=1; } }
+
+    function finder(r0,c0){
+      for(r=-1;r<=7;r++) for(c=-1;c<=7;c++){
+        var dist=Math.max(Math.abs(r-3),Math.abs(c-3));
+        setFn(r0+r,c0+c,(dist!==2&&dist<=3)?1:0);
+      }
+    }
+    finder(0,0); finder(0,size-7); finder(size-7,0);
+
+    for(i=8;i<size-8;i++){ setFn(6,i,(i%2===0)?1:0); setFn(i,6,(i%2===0)?1:0); }
+
+    var al=ALIGN[ver-1];
+    for(i=0;i<al.length;i++) for(j=0;j<al.length;j++){
+      var ar=al[i],ac=al[j];
+      if((ar===6&&ac===6)||(ar===6&&ac===size-7)||(ar===size-7&&ac===6)) continue;
+      for(r=-2;r<=2;r++) for(c=-2;c<=2;c++)
+        setFn(ar+r,ac+c,(Math.max(Math.abs(r),Math.abs(c))!==1)?1:0);
+    }
+
+    setFn(size-8,8,1); /* 固定黑模块 */
+
+    /* 预留格式信息区(跳过 i=6:那是时序图形,不能清掉) */
+    for(i=0;i<9;i++){ if(i!==6){ setFn(8,i,0); setFn(i,8,0); } }
+    for(i=0;i<8;i++){ setFn(8,size-1-i,0); setFn(size-1-i,8,0); }
+
+    /* 版本信息(版本 7 及以上) */
+    if(ver>=7){
+      var vrem=ver;
+      for(i=0;i<12;i++) vrem=(vrem<<1)^((vrem>>>11)*0x1F25);
+      var vbits=(ver<<12)|vrem;
+      for(i=0;i<18;i++){
+        var bit=(vbits>>>i)&1;
+        setFn(Math.floor(i/3),size-11+(i%3),bit);
+        setFn(size-11+(i%3),Math.floor(i/3),bit);
+      }
+    }
+
+    /* 数据放置:右下角起,之字形,跳过第 6 列 */
+    var idx=0,upward=true;
+    for(var right=size-1;right>=1;right-=2){
+      if(right===6) right=5;
+      for(var vert=0;vert<size;vert++){
+        for(j=0;j<2;j++){
+          c=right-j;
+          r=upward?(size-1-vert):vert;
+          if(!fn[r][c]){
+            m[r][c]=(idx<bits.length)?bits[idx]:0;
+            idx++;
+          }
+        }
+      }
+      upward=!upward;
+    }
+
+    /* 选掩码 */
+    var best=null,bestPenalty=Infinity;
+    for(var mask=0;mask<8;mask++){
+      var cand=applyMask(m,fn,size,mask);
+      placeFormat(cand,fn,size,ec,mask);
+      var p=penalty(cand,size);
+      if(p<bestPenalty){ bestPenalty=p; best=cand; }
+    }
+    return {size:size,modules:best,version:ver};
+  }
+
+  function maskFn(mask,r,c){
+    switch(mask){
+      case 0: return (r+c)%2===0;
+      case 1: return r%2===0;
+      case 2: return c%3===0;
+      case 3: return (r+c)%3===0;
+      case 4: return (Math.floor(r/2)+Math.floor(c/3))%2===0;
+      case 5: return (r*c)%2+(r*c)%3===0;
+      case 6: return ((r*c)%2+(r*c)%3)%2===0;
+      case 7: return ((r+c)%2+(r*c)%3)%2===0;
+    }
+  }
+  function applyMask(m,fn,size,mask){
+    var out=[];
+    for(var r=0;r<size;r++){
+      out.push(m[r].slice());
+      for(var c=0;c<size;c++)
+        if(!fn[r][c] && maskFn(mask,r,c)) out[r][c]^=1;
+    }
+    return out;
+  }
+  function placeFormat(m,fn,size,ec,mask){
+    var data=(ECBITS[ec]<<3)|mask, rem=data;
+    for(var i=0;i<10;i++) rem=(rem<<1)^((rem>>>9)*0x537);
+    var bits=((data<<10)|rem)^0x5412;
+    for(i=0;i<15;i++){
+      var b=(bits>>>i)&1;
+      if(i<6) m[i][8]=b;
+      else if(i<8) m[i+1][8]=b;
+      else if(i===8) m[8][7]=b;
+      else m[8][14-i]=b;
+      if(i<8) m[8][size-1-i]=b;
+      else m[size-15+i][8]=b;
+    }
+    m[size-8][8]=1;
+  }
+
+  function penalty(m,size){
+    var p=0,r,c,i,run,dark=0;
+    /* 规则 1:同色连续 */
+    for(r=0;r<size;r++){
+      run=1;
+      for(c=1;c<size;c++){
+        if(m[r][c]===m[r][c-1]) run++;
+        else { if(run>=5) p+=3+(run-5); run=1; }
+      }
+      if(run>=5) p+=3+(run-5);
+    }
+    for(c=0;c<size;c++){
+      run=1;
+      for(r=1;r<size;r++){
+        if(m[r][c]===m[r-1][c]) run++;
+        else { if(run>=5) p+=3+(run-5); run=1; }
+      }
+      if(run>=5) p+=3+(run-5);
+    }
+    /* 规则 2:2×2 同色块 */
+    for(r=0;r<size-1;r++) for(c=0;c<size-1;c++)
+      if(m[r][c]===m[r][c+1]&&m[r][c]===m[r+1][c]&&m[r][c]===m[r+1][c+1]) p+=3;
+    /* 规则 3:类似定位图形 */
+    var pat=[1,0,1,1,1,0,1,0,0,0,0];
+    function match(get){
+      var n=0;
+      for(var s=0;s+11<=size;s++){
+        var ok=true;
+        for(var k=0;k<11;k++) if(get(s+k)!==pat[k]){ ok=false; break; }
+        if(ok) n++;
+        ok=true;
+        for(k=0;k<11;k++) if(get(s+k)!==pat[10-k]){ ok=false; break; }
+        if(ok) n++;
+      }
+      return n;
+    }
+    for(r=0;r<size;r++) p+=40*match(function(x){ return m[r][x]; });
+    for(c=0;c<size;c++) p+=40*match(function(x){ return m[x][c]; });
+    /* 规则 4:黑白比例 */
+    for(r=0;r<size;r++) for(c=0;c<size;c++) if(m[r][c]) dark++;
+    var pct=dark*100/(size*size);
+    p+=10*Math.floor(Math.abs(pct-50)/5);
+    return p;
+  }
+
+  /* ---- 渲染 ---- */
+  function render(qr,quiet){
+    var size=qr.size, total=size+quiet*2, d="";
+    for(var r=0;r<size;r++) for(var c=0;c<size;c++)
+      if(qr.modules[r][c]) d+="M"+(c+quiet)+" "+(r+quiet)+"h1v1h-1z";
+    return '<svg viewBox="0 0 '+total+' '+total+'" xmlns="http://www.w3.org/2000/svg">'+
+           '<rect width="'+total+'" height="'+total+'" fill="#fff"/>'+
+           '<path d="'+d+'" fill="#1a1012"/></svg>';
+  }
+
+  /* 二维码内容 = 本站 index.html 的绝对网址,自动推算,无需手工填写 */
+  var box=document.getElementById("qr");
+  var status=document.getElementById("status");
+  var isWeb=(location.protocol==="http:"||location.protocol==="https:");
+  var TARGET_URL=isWeb ? new URL("./", location.href).href : "";
+
+  if(!isWeb){
+    box.innerHTML='<p style="font-size:12px;color:var(--coral);padding:60px 16px;text-align:center;line-height:1.9">'+
+      '这个页面需要放到网站上才能生成二维码。<br>本地双击打开时拿不到网址。</p>';
+    status.innerHTML='<b>还没上线</b><ul>'+
+      '<li>把 <code>index.html</code> 和 <code>scan.html</code> 一起传到 GitHub Pages 之后,再打开这一页。</li>'+
+      '<li>那时二维码会自动指向你的网站,不用改任何代码。</li></ul>';
+    return;
+  }
+
+  try{
+    /* H 级纠错:约 30% 容错,中间压一个小徽标也能扫出来 */
+    var qr=encode(TARGET_URL,"H");
+    box.innerHTML=render(qr,2);
+    document.getElementById("urlline").textContent=TARGET_URL;
+    status.innerHTML=
+      '<b>这张码指向</b><br><code>'+TARGET_URL+'</code>'+
+      '<ul>'+
+        '<li>网址是本页自动推算的(就是本站根目录,会打开 index.html),换域名也不用改代码。</li>'+
+        '<li>二维码版本 '+qr.version+'('+qr.size+'×'+qr.size+' 模块),H 级纠错,中心徽标不影响识别。</li>'+
+        '<li>二维码在你的浏览器里本地算出,没有调用任何在线生成服务。</li>'+
+        '<li>直接打印这一页即可,这段说明不会被打印出来。</li>'+
+      '</ul>';
+  }catch(e){
+    box.innerHTML='<p style="font-size:12px;color:var(--coral);padding:40px 10px;text-align:center">二维码生成失败:'+e.message+'</p>';
+    status.textContent="二维码生成失败:"+e.message;
+  }
+})();
+</script>
+
+</body>
+</html>
