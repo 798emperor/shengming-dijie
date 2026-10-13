@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="遗体与人体器官捐献科普:点开人体地图,看每一处器官做什么、全国有多少人在等它。">
 <meta name="theme-color" content="#c8352c">
+<script defer src="https://vercount.one/js"></script>
 <title>生命递接</title>
 <style>
   :root{
@@ -298,6 +299,20 @@
   .minibtn:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
   .minibtn svg{width:21px;height:21px;display:block;color:var(--jade)}
 
+  .counter{
+    appearance:none;cursor:pointer;font-family:inherit;color:var(--ink-soft);
+    background:var(--paper-2);border:1px solid var(--line);border-radius:999px;
+    margin:0 22px 26px;padding:9px 15px;display:none;align-items:center;gap:9px;
+    font-size:12px;letter-spacing:.06em;align-self:flex-start;
+    transition:border-color .16s ease;
+  }
+  .counter.on{display:inline-flex}
+  .counter:hover{border-color:var(--coral)}
+  .counter:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+  .counter svg{width:15px;height:15px;color:var(--coral);flex:0 0 auto}
+  .counter b{font-variant-numeric:tabular-nums;font-weight:600;color:var(--coral)}
+  .counter .hint{color:var(--muted);font-size:10.5px}
+
   .notice{
     margin:0 22px 26px;padding:13px 15px;border-left:2px solid var(--jade);
     font-size:11px;line-height:1.75;color:var(--muted);background:var(--paper-2);
@@ -516,6 +531,15 @@
         </button>
       </div>
     </div>
+
+    <button class="counter" id="counter" type="button" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span id="clabel">总访问量</span>
+      <b id="cvalue">—</b>
+      <span class="hint" id="chint">点一下换访客数</span>
+    </button>
+    <span id="busuanzi_value_site_pv" style="display:none"></span>
+    <span id="busuanzi_value_site_uv" style="display:none"></span>
 
     <p class="notice">数字来自国家卫生健康委和《中国器官捐献和移植发展报告》,案例来自公开报道,都标了出处和时点。有几类器官查不到公开数据,卡片里写了原因。</p>
   </section>
@@ -923,6 +947,27 @@
   scrim.addEventListener("click",closeSheet);
   document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeSheet(); });
 
+
+  /* ---- 访问计数(Vercount,不蒜子兼容) ---- */
+  (function(){
+    var btn=$("counter"), pvEl=$("busuanzi_value_site_pv"), uvEl=$("busuanzi_value_site_uv");
+    var showUV=false, tries=0;
+    function val(el){ return el && el.textContent.replace(/[^0-9]/g,""); }
+    function paint(){
+      var v=showUV?val(uvEl):val(pvEl);
+      if(!v) return false;
+      $("clabel").textContent=showUV?"总访客数":"总访问量";
+      $("cvalue").textContent=Number(v).toLocaleString("zh-CN");
+      $("chint").textContent=showUV?"点一下换访问量":"点一下换访客数";
+      return true;
+    }
+    var iv=setInterval(function(){
+      tries++;
+      if(paint()){ btn.classList.add("on"); clearInterval(iv); }
+      else if(tries>30){ clearInterval(iv); }   /* 9 秒还没来就放弃,不显示 */
+    },300);
+    btn.addEventListener("click",function(){ showUV=!showUV; paint(); });
+  })();
 
   /* ---- toast ---- */
   var tEl=null, tTimer=null;
